@@ -24,16 +24,20 @@ if __name__ == '__main__':
     # result = ak.stock_zh_a_daily(symbol="sz000006", start_date=start_date, end_date=end_date)
     # print(result)
 
-    for stock in to_update_stock:
+    tot_result = []
+    for stock in to_update_stock[0:100]:
         try:
             response = ak.stock_zh_a_daily(symbol=stock, start_date=start_date, end_date=end_date)
             cnt+=1
             current_thread_name = threading.current_thread().name
-            current_timestmap = time.mktime(date_time.timetuple()))
-            result = f"{stock} {response['open']} {response['low']} {current_thread_name}"
-            if cnt%100==0:
+            current_timestmap = time.time()
+            result = f"{stock} {response['open']} {response['low']} {current_thread_name} {current_timestmap}"
+            tot_result.append(result)
+            if cnt % 100 == 0:
                 print(f"{cnt} has done!")
         except Exception as e:
             print(f"{stock} has {e}")
 
-
+    with open("./secrets/as_is_call_result.txt", "w") as f:
+        for record in tot_result:
+            f.write(f"{record}\n")
