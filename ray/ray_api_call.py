@@ -2,7 +2,7 @@ import ray
 import akshare as ak
 import threading
 import time
-
+from ray._private import utils
 
 def upload_stock():
     my_list = []
@@ -16,13 +16,15 @@ def upload_stock():
 def scrape_stock_data(stock, start_date):
     current_thread_name = threading.current_thread().name
     current_timestmap = time.time()
+    cpu_id = utils.get_system_memory().get("node:0/cpu:0", {}).get("cpu_affinity", None)
+
     try:
         response = ak.stock_zh_a_daily(symbol=stock, start_date=start_date, end_date=start_date)
 
-        result = f"{stock} {response['open']} {response['low']} {current_thread_name} {current_timestmap}"
+        result = f"{stock} {response['open']} {response['low']} cpu-core({cpu_id}) thread({current_thread_name}) {current_timestmap}"
 
     except Exception as e:
-        result = f"{stock} ERROR ERROR-low {current_thread_name} {current_timestmap}"
+        result = f"{stock} ERROR ERROR-low cpu-core({cpu_id}) thread({current_thread_name}_ {current_timestmap}"
         print(f"{stock} has {e}")
     return result
 
@@ -41,6 +43,6 @@ if __name__ == '__main__':
         if future is not None:
             final_result_list.append(future)
 
-    with open("./secrets/ray_call_result.txt", "w") as f:
+    with open("./secrets/ray_call_result_cpu.txt", "w") as f:
         for record in final_result_list:
             f.write(f"{record}\n")
