@@ -17,10 +17,6 @@ def scrape_stock_data(stock):
     current_thread_name = threading.current_thread().name
     current_timestmap = time.time()
 
-    process = multiprocessing.current_process()
-    process_id = process.pid
-    process_info = psutil.Process(process_id)
-
     process_cpu_affinity = "don't know"
 
     #    cpu_id = utils.get_system_memory().get("node:0/cpu:0", {}).get("cpu_affinity", None)
@@ -36,10 +32,13 @@ def scrape_stock_data(stock):
     return result
 
 if __name__ == '__main__':
-    to_update_stock = upload_stock()[0:100]
+
+    start_time = time.time()
+    to_update_stock = upload_stock()[0:300]
     pool = multiprocessing.Pool(processes=4)
     results = pool.map(scrape_stock_data, to_update_stock)
-
-    with open("./secrets/multiprocessing_cpu_call.txt", "w") as f:
+    end_time =  time.time()
+    with open("./secrets/multiprocessing_cpu_call_4process_0.3k.txt", "w") as f:
         for record in results:
             f.write(f"{record}\n")
+        f.write(f"tot elapsed : {end_time - start_time}")

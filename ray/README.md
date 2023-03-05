@@ -25,11 +25,24 @@
     * dashboard 랑 cluster 를 띄우기 위해서 필요한 install
 * `pip install -U ray`
     * minimal dependency 로 설치하는 것 
+
+## 실험결과
+* task : 8-core 짜리 cpu에서 network I/O 작업을 돌렷음 (약 300번의 api 호출을 함)
+  * 여기서 각각의 api가 "No value to decode" 라는 응답을 받고, 빨리끝나거나, 혹은 생각보다 오래걸리지도...
+  * 그래서 단순히 elapsed second 비교는 바람직하지 않을 수도 있음..!
+* ray -> worker 16개로 돌아감 
+  * 각 task의 로그를 찍어봤을떄, task 착수시점이 16개씩 단위로 초가 다 같다. 
+  * 26초 정도 걸림
+* multi-processing 
+  * Pool 에다가 몇개의 process를 줬는지에 따라 많이 다른듯 
+    * 16개(ray의 병렬성과 같게끔) : 25초 정도 
+    * 4개 : 55초 정도..! 
+
   
 ## ray_init() 설정 
 #### memory 설정 
 * 방법 
   `ray.init(object_store_memory=4 * 1024 * 1024 * 1024) # 4GB`
   
-* 의미 혹은 의의  
-  * 
+* 의미 혹은 의의
+  
